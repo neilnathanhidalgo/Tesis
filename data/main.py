@@ -32,11 +32,7 @@ if "preprocessed_data" not in os.listdir():
   os.mkdir("preprocessed_data")
 ds_answer=args.answer
 if ds_answer=="U":
-  ds_name=input("Escriba el nombre del data set a trabajar: ")
-  if ds_name=="Mhealth":
-    sensor,data=load_MHEAL(subjects=True)
-  elif ds_name=="Opportunity_Imu":
-    sensor,data=load_OPPT_I(subjects=True)
+  sensor,data=load_MHEAL(subjects=True)
   subject_features=[]
   n=len(data)
 
@@ -46,8 +42,8 @@ if ds_answer=="U":
     features, labels, sensor_names = time_window(data[i], window_size , overlapping)
     
     h_features, column_names = handcrafted_features(features, 
-                                                  [min, max, mean, std, median],
-                                                  ["min", "max", "mean", "std", "median"],
+                                                  functions,
+                                                  ["mean", "rango", "std", "max", "min","var", "median"],
                                                   sensor_names)
     df_processed = pd.DataFrame(h_features)
     
@@ -66,12 +62,8 @@ if ds_answer=="U":
   df_final['ID'] = None
   df_final['DTS'] = None
   for j in range(num_vari):
-    if ds_name=="Mhealth":
-      df_final.loc[j,'ID']=("MHE_{}".format(contador))
-      df_final.loc[j,'DTS']=ds_name
-    elif ds_name=="Opportunity_Imu":
-      df_final.loc[j,'ID']=("OPTY_{}".format(contador))
-      df_final.loc[j,'DTS']="Opportunity"
+    df_final.loc[j, 'ID'] = ("MHE_{}".format(contador))
+    df_final.loc[j, 'DTS'] = "Mhealth"
     contador +=1
   df_final=df_final.reindex(columns=['ID', 'DTS', 'Subject','Activity','Sensor'] + list(df_final.columns.difference(['ID', 'DTS', 'Subject','Activity','Sensor'])))
-  df_final.to_csv("alter_preprocessed_data/{}_{}_{}.csv".format(ds_name, window_size, int(args.overlapping)), index=False)
+  df_final.to_csv("preprocessed_data/{}_{}_{}.csv".format("Mhealth", window_size, int(args.overlapping)), index=False)
